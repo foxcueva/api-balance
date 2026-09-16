@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # moonshot_balance.py — 查询 Kimi（月之暗面 Moonshot）账户余额（只读）
-# 作者：Ailurus, 2026-09 | License: MIT
+# 作者：foxcueva, 2026-09 | License: MIT
 # 仅供学习与个人使用，无任何担保；免责声明与风险提示见仓库 README
 """查询 Kimi（月之暗面 Moonshot）API 账户余额。零依赖，单文件即用。
 
