@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # check_balance.py — 自动识别厂商并查询 LLM API 账户余额（只读）
-# 作者：Ailurus, 2026-09 | License: MIT
+# 作者：foxcueva, 2026-09 | License: MIT
 # 仅供学习与个人使用，无任何担保；免责声明与风险提示见仓库 README
 """自动识别 API key 属于哪家服务商，并查询账户余额。零依赖（纯 Python 标准库）。
 
