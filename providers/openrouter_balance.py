@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # openrouter_balance.py — 查询 OpenRouter 账户额度（只读）
-# 作者：Ailurus, 2026-09 | License: MIT
+# 作者：foxcueva, 2026-09 | License: MIT
 # 仅供学习与个人使用，无任何担保；免责声明与风险提示见仓库 README
 """查询 OpenRouter 账户额度/用量。零依赖，单文件即用。
 
