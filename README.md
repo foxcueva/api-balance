@@ -1,6 +1,6 @@
 # api-balance
 
-查询 LLM API 账户余额的命令行工具集。零依赖（纯 Python 标准库），Python 3.6+ 开箱即用。
+查询 LLM API 账户余额的命令行工具集。零依赖（纯 Python 标准库），Python 3.10+ 开箱即用。
 
 两种用法，按需选择：
 
