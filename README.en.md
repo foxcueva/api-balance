@@ -1,101 +1,133 @@
-════════════════════════════════════════════════
- Snail Mail 仓库 · 电脑操作指引（2026-09-14）
- 前提：手机上已完成改名 envelope-templates → snail-mail
- 上传包：snail-mail_全量上传包_20260914.zip（已解压）
-════════════════════════════════════════════════
+# api-balance
 
-【第 1 步 · 打开上传页】
-浏览器进 https://github.com/foxcueva/snail-mail
-→ 右上 Add file ▾ → Upload files
+English | [中文](README.md)
 
-【第 2 步 · 拖入 4 样】
-打开解压出来的 snail-mail 文件夹，把里面这 4 样
-一起选中，拖进上传区：
-  ① envelope 文件夹（整个拖，自动带路径）
-  ② README.md
-  ③ README.zh-CN.md
-  ④ LICENSE
-⚠️ 拖的是「snail-mail 文件夹里面的东西」，
-   不要拖 snail-mail 外壳本身（会套娃）。
+A command-line tool for checking your LLM API balance: hand it a key, and it tells you how much is left on that key.
 
-【第 3 步 · Commit 前检查】
-□ 共 9 个文件（3 SVG + 3 PDF + 2 README + 1 LICENSE）
-□ 六个模板文件前带 envelope/c6/、envelope/dl/、envelope/c5/ 前缀
-□ 没有出现 snail-mail/envelope/… 双层前缀
-→ Commit message 填：
-Restructure to envelope/{c6,dl,c5}; relicense to CC BY 4.0
-→ 点 Commit changes
+Built on the Python standard library only — no dependencies, runs on Python 3.6+.
 
-【第 4 步 · 删旧文件（6 个，2-3 分钟）】
-回到仓库主页，逐个打开旧顶层目录 c6/、dl/、c5/
-里的 6 个旧文件：
-→ 右上 ··· → Delete file → Commit changes
-（每删一个 commit 一次，正常现象）
-删完主页只剩 envelope/ 一个文件夹 + 2 README + LICENSE。
+> Unofficial tool, not affiliated with any provider mentioned below. It only calls the read-only endpoints each provider documents publicly. Read the [disclaimer](#disclaimer) before using it.
 
-【第 5 步 · 建 3 个 Release】
-页面右侧 Releases → Draft a new release：
-  · Choose a tag → 输入 tag 名 → 选 "Create new tag on publish"
-  · 填 Title、粘贴下方对应描述
-  · Publish release
-重复三次，tag 分别为：
-  c6-v1.1.0 / dl-v1.1.0 / c5-v1.0.0
+## Why this exists
 
-────────────────────────────────────────
-【Release 文案 ①】tag: c6-v1.1.0
-Title: c6-v1.1.0
-────────────────────────────────────────
-## License change: CC BY-NC-SA 4.0 → CC BY 4.0
+Checking a balance normally means opening a browser, logging in, and finding the right page — different for every provider, and something an agent can't do for you. This script moves it to the command line: one command in your terminal, or one sentence to your agent.
 
-All templates are now licensed under CC BY 4.0 — commercial use allowed with attribution (credit 湫黎 · github.com/foxcueva, keep embedded dc:creator/dc:rights metadata).
+## Supported providers
 
-Files downloaded under v1.0.0 remain governed by CC BY-NC-SA 4.0.
+| Provider | Balance | Endpoint |
+| --- | --- | --- |
+| DeepSeek | Yes | `GET /user/balance` |
+| Kimi (Moonshot) | Yes | `GET /v1/users/me/balance` |
+| SiliconFlow | Yes | `GET /v1/user/info` |
+| OpenRouter | Yes | `GET /api/v1/key` (shows used / limit) |
+| OpenAI | No | No public balance API — check platform.openai.com |
+| Anthropic | No | No public balance API — check console.anthropic.com |
+| Zhipu GLM | No | No public per-account balance API — check open.bigmodel.cn |
+| Google AI Studio | N/A | Free-tier credits, no balance concept |
 
-- [C6-envelope-die-line_editable.svg](https://raw.githubusercontent.com/foxcueva/snail-mail/main/envelope/c6/C6-envelope-die-line_editable.svg)
-- [C6-envelope-die-line_print.pdf](https://raw.githubusercontent.com/foxcueva/snail-mail/main/envelope/c6/C6-envelope-die-line_print.pdf)
+For providers without a public API, the script won't guess blindly — it tells you where to look instead.
 
-────────────────────────────────────────
-【Release 文案 ②】tag: dl-v1.1.0
-Title: dl-v1.1.0
-────────────────────────────────────────
-## License change: CC BY-NC-SA 4.0 → CC BY 4.0
+## Three ways to use it
 
-All templates are now licensed under CC BY 4.0 — commercial use allowed with attribution (credit 湫黎 · github.com/foxcueva, keep embedded dc:creator/dc:rights metadata).
+### 1. Install as an OpenClaw skill
 
-Files downloaded under v1.0.0 remain governed by CC BY-NC-SA 4.0.
+```bash
+git clone https://github.com/foxcueva/api-balance.git ~/.openclaw/skills/api-balance
+```
 
-- [DL-envelope-die-line_editable.svg](https://raw.githubusercontent.com/foxcueva/snail-mail/main/envelope/dl/DL-envelope-die-line_editable.svg)
-- [DL-envelope-die-line_print.pdf](https://raw.githubusercontent.com/foxcueva/snail-mail/main/envelope/dl/DL-envelope-die-line_print.pdf)
+Then just ask Claw: "check my API balance". Where the skills directory lives depends on your OpenClaw version — see its docs.
 
-────────────────────────────────────────
-【Release 文案 ③】tag: c5-v1.0.0
-Title: c5-v1.0.0
-────────────────────────────────────────
-## Initial release: C5 (GB/T 1416 size 7)
+### 2. Grab a single-file script
 
-ISO C5 envelope, 229 × 162 mm, holds A4 half-fold (A5 flat). A3 paper, true 1:1.
-54 mm closure flap (R10) · 12 mm side gussets · 100 mm calibration ruler · CC BY 4.0.
+Each provider has one standalone file under `providers/` — zero dependencies, copy it and run it. If you only ever use one provider, this is the better option: no probing, it talks to that one provider only.
 
-- [C5-envelope-die-line_editable.svg](https://raw.githubusercontent.com/foxcueva/snail-mail/main/envelope/c5/C5-envelope-die-line_editable.svg)
-- [C5-envelope-die-line_print.pdf](https://raw.githubusercontent.com/foxcueva/snail-mail/main/envelope/c5/C5-envelope-die-line_print.pdf)
+| File | Environment variable | Get a key at |
+| --- | --- | --- |
+| `deepseek_balance.py` | `DEEPSEEK_API_KEY` | platform.deepseek.com |
+| `moonshot_balance.py` | `MOONSHOT_API_KEY` | platform.moonshot.cn |
+| `siliconflow_balance.py` | `SILICONFLOW_API_KEY` | cloud.siliconflow.cn |
+| `openrouter_balance.py` | `OPENROUTER_API_KEY` | openrouter.ai/keys |
 
-────────────────────────────────────────
-【第 6 步 · About 与 Topics】
-仓库右上 About 齿轮：
-  Description:
-Print-ready envelope & postcard die-line templates — 1:1, cut & fold, CC BY 4.0
-  Topics 加：snailmail  postcard  print
-（原有 envelope、template 等保留）
+DeepSeek example:
 
-【第 7 步 · 喊 Sam 终检】
-全部完成后回到聊天里说一声，我会拉取远端
-6 个文件做 SHA-256 逐字节终检 + README 渲染检查。
+```bash
+export DEEPSEEK_API_KEY=sk-xxxx
+python3 deepseek_balance.py
 
-预期指纹（供对照，终检以远端实算为准）：
-09bb0759…a01b9a9cad77159e85122  envelope/c5/C5-envelope-die-line_editable.svg
-b18bd29f…026aee0362157d        envelope/c5/C5-envelope-die-line_print.pdf
-c88a8030…98f84f73e             envelope/c6/C6-envelope-die-line_editable.svg
-478d0ab0…00d6d17f40            envelope/c6/C6-envelope-die-line_print.pdf
-f2389d71…f6645f66              envelope/dl/DL-envelope-die-line_editable.svg
-02cc20de…eb2a81410be9604ede5e  envelope/dl/DL-envelope-die-line_print.pdf
-════════════════════════════════════════════════
+# or skip the environment variable and pass the key directly
+python3 deepseek_balance.py --key sk-xxxx
+```
+
+On Windows:
+
+```powershell
+$env:DEEPSEEK_API_KEY="sk-xxxx"   # PowerShell
+set DEEPSEEK_API_KEY=sk-xxxx      # CMD
+python deepseek_balance.py
+```
+
+### 3. Run the smart script directly
+
+```bash
+python3 check_balance.py              # finds your key, detects the provider
+python3 check_balance.py --list       # supported providers
+python3 check_balance.py --dry-run    # show the detection plan only, no requests
+python3 check_balance.py --provider moonshot    # pin a provider
+```
+
+Key lookup order: `--key` argument > environment variables (`BALANCE_API_KEY` or provider-specific ones) > local `~/.openclaw/openclaw.json`.
+
+#### How provider detection works
+
+| Key looks like | Verdict |
+| --- | --- |
+| starts with `sk-or-` | OpenRouter |
+| starts with `sk-ant-` | Anthropic (reports "not supported") |
+| starts with `AIza` | Google (reports "no balance concept") |
+| `id.xxx.xxx` pattern | Zhipu (reports "not supported") |
+| other `sk-` prefix | probes in order: DeepSeek → Kimi → SiliconFlow |
+| anything else | asks you to use `--provider` |
+
+OpenAI, DeepSeek and Kimi all use the `sk-` prefix, so the prefix alone isn't enough — that's why probing exists. Probing sends your key to the candidate providers' APIs (the key is never logged). If that bothers you, use `--provider` to skip it. Once a key has been identified, the result is cached in `~/.cache/balance-check.json` (SHA256 fingerprint only, never the key itself), so the next run is instant.
+
+## Sample output
+
+```json
+{
+  "is_available": true,
+  "balance_infos": [
+    {
+      "currency": "CNY",
+      "total_balance": "110.00",
+      "granted_balance": "10.00",
+      "topped_up_balance": "100.00"
+    }
+  ]
+}
+```
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| `HTTP 401` | Key invalid, or belongs to a different provider (probing moves on automatically) |
+| `Network error` | Check your network and proxy settings |
+| `Environment variable not set` | Set it as shown above; note it only applies to the current terminal session |
+
+## Disclaimer
+
+Read this section before running anything. It restates, more concretely, the terms in the [LICENSE](./LICENSE) (MIT).
+
+**1. Not an official tool.** A personal learning project. Not affiliated with, endorsed, or authorized by DeepSeek, Moonshot (Kimi), SiliconFlow, OpenRouter, OpenAI, Anthropic, Zhipu, or Google. Provider names and trademarks only identify which service the script talks to; they belong to their respective owners.
+
+**2. No warranty.** Provided "as is", without warranty of any kind, to the extent permitted by law. Balances shown are for reference only — the provider's own console is always authoritative. APIs may change or disappear at any time; no promise of continued maintenance. The author is not liable for any direct or indirect loss arising from the use of this tool (including key leaks or account losses).
+
+**3. Your key stays yours.** The script collects nothing, uploads nothing, no telemetry. Your key only exists on your machine: environment variables, command-line arguments, or the local `~/.openclaw/openclaw.json` file (read only to locate the key; it never leaves your device). The detection cache stores a SHA256 fingerprint only, never the key itself — delete the file if you don't want it. One thing to be clear about: **the smart script's probing sends your key to DeepSeek, Kimi, and SiliconFlow in sequence.** If you'd rather it didn't, use `--provider`, preview the plan with `--dry-run`, or just use a single-file script, which talks to one provider only. Finally: treat your key like a password. Don't share it, don't commit it, don't hardcode it. If it leaks, revoke and reissue it immediately — the consequences of a leaked key are on its owner.
+
+**4. Stay within the rules.** The script only calls documented read-only endpoints, but you are responsible for making sure your use complies with each provider's terms of service. Use your own key, for your own account. Sharing, reselling, or using someone else's key is a violation, and any resulting trouble has nothing to do with this project.
+
+**5. Nature of the project.** A personal code record, shared for learning. Not a commercial service, not consulting.
+
+## License
+
+[MIT](./LICENSE)
